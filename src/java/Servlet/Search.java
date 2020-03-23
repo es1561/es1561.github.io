@@ -18,6 +18,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @WebServlet(name = "executaEvento", urlPatterns ={"/executaEvento"})
@@ -43,14 +44,12 @@ public class Search extends HttpServlet
                 // wrap the urlconnection in a bufferedreader
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
-                String line;
-                List<JSONObject> arrJson = new ArrayList<>();
-                // read from the urlconnection via the bufferedreader
-                while((line = bufferedReader.readLine()) != null)
-                {
-                    content.append(line + "\n");
-                    arrJson.add(new JSONObject(line));
-                }
+                String line = bufferedReader.readLine();
+                JSONArray array = new JSONArray(line);
+                
+                JSONObject Json = new JSONObject(array.get(0).toString());
+                
+                content.append(Json.toString());
                 bufferedReader.close();
                 out.println(content.toString());
             }
