@@ -32,7 +32,7 @@ public class Search extends HttpServlet
             try
             {
                 // create a url object
-                URL url = new URL("https://www.albion-online-data.com/api/v1/stats/View/" + request.getAttribute("item_id").toString());
+                URL url = new URL("https://www.albion-online-data.com/api/v1/stats/View/" + request.getParameter("item_id").toString());
 
                 // create a urlconnection object
                 URLConnection urlConnection = url.openConnection();

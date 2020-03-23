@@ -1,15 +1,14 @@
 function evSearch()
 {
     event.preventDefault(); // evita refresh da tela
-    let frm = $("#form_search");    
+      
     jQuery.ajax(
     {
         type: "POST",
-        url: "executaEvento?evento=atualizaGridPiada",
-        data: frm.serialize(),
+        url: "executaEvento?item_id="+$('#item_id').val(),
         success: function (data) 
         {
-            $('#containerPiadas').html(data);
+            $('#result').html(data);
         }
     });
     return true;

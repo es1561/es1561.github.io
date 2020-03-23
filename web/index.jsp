@@ -13,10 +13,11 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <form id="form_search" method="POST" action="evSearch()">
+        <form id="form_search" method="POST" onsubmit="evSearch()">
             <input id="item_id" name="item" type="text" required autofocus>
             <input type="submit" value="Buscar"/>
         </form>
+        <div id="result"></div>
         
         <script src="js/jquery-3.4.1.js" type="text/javascript"></script>
         <script src="js/script.js" type="text/javascript"></script>
