@@ -5,10 +5,12 @@
  */
 package Servlet;
 
+import Class.Item;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -35,21 +37,60 @@ public class Search extends HttpServlet
 
             try
             {
-                // create a url object
                 URL url = new URL("https://www.albion-online-data.com/api/v2/stats/history/" + request.getParameter("item_id").toString() + "?time-scale=1");
-
-                // create a urlconnection object
                 URLConnection urlConnection = url.openConnection();
-
-                // wrap the urlconnection in a bufferedreader
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
                 String line = bufferedReader.readLine();
                 JSONArray array = new JSONArray(line);
+                JSONArray data;
+                JSONObject json_ciry, json_item;
+                String location, count, price, time;
+                ArrayList<Item> itens;
+                Item aux;
+                int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE, avg = 0;
                 
-                JSONObject Json = new JSONObject(array.get(0).toString());
+                for(Object obj_city: array)
+                {
+                    itens = new ArrayList<Item>();
+                    json_ciry = new JSONObject(obj_city.toString());
+                    location = json_ciry.get("location").toString();
+                    
+                    data = new JSONArray(json_ciry.get("data").toString());
+                    for(Object obj_item: data)
+                    {
+                        json_item = new JSONObject(obj_item.toString());
+                        count = json_item.get("item_count").toString();
+                        price = json_item.get("avg_price").toString();
+                        
+                        aux = new Item(location, count, price);
+                        
+                        min = Math.min(min, aux.getPrice());
+                        max = Math.max(max, aux.getPrice());
+                        avg += aux.getPrice();
+                    }
+                    avg /= data.length();
+                    line =  "<table>\n" +
+                            "  <tr>\n" +
+                            "    <th>" + location + "</th>\n" +
+                            "  </tr>\n" +
+                            "  <tr>\n" +
+                            "    <td>Min</td>\n" +
+                            "    <td>Avg</td>\n" +
+                            "    <td>Max</td>\n" +
+                            "  </tr>\n" +
+                            "  <tr>\n" +
+                            "    <td>" + min + "</td>\n" +
+                            "    <td>" + avg + "</td>\n" +
+                            "    <td>" + max + "</td>\n" +
+                            "  </tr>\n" +
+                            "</table>\n" +
+                            "<br>";
+                    
+                    content.append(line);
+                }
                 
-                content.append(Json.toString());
+                
                 bufferedReader.close();
                 out.println(content.toString());
             }
