@@ -16,6 +16,7 @@
         <form id="form_search" method="POST" onsubmit="evSearch()">
             <input id="item_id" name="item" type="text" required autofocus>
             <input type="submit" value="Buscar"/>
+            <a href="https://github.com/broderickhyman/ao-bin-dumps/blob/master/formatted/items.txt" target="_blank">Item List</a>
         </form>
         <div id="result"></div>
         

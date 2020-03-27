@@ -14,6 +14,8 @@ import java.lang.reflect.Array;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,60 +39,112 @@ public class Search extends HttpServlet
 
             try
             {
-                URL url = new URL("https://www.albion-online-data.com/api/v2/stats/history/" + request.getParameter("item_id").toString() + "?time-scale=1");
+                URL url = new URL("https://www.albion-online-data.com/api/v1/stats/Charts/" + request.getParameter("item_id").toString());
                 URLConnection urlConnection = url.openConnection();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 
                 String line = bufferedReader.readLine();
+                String head, body = "", location;
                 JSONArray array = new JSONArray(line);
-                JSONArray data;
-                JSONObject json_ciry, json_item;
-                String location, count, price, time;
-                ArrayList<Item> itens;
+                JSONArray a_min, a_avg, a_max, a_count, a_time;
+                JSONObject json_ciry, json_item, data;
                 Item aux;
-                int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE, avg = 0;
+                ArrayList<Item> itens;
+                
+                head =  "<table>\n" +
+                            "  <tr>\n" +
+                            "    <th>Location</th>\n" +
+                            "    <th>Min</th>\n" +
+                            "    <th>Avg</th>\n" +
+                            "    <th>Max</th>\n" +
+                            "  </tr>";
                 
                 for(Object obj_city: array)
                 {
+                    int min = Integer.MAX_VALUE, avg = 0, max = Integer.MIN_VALUE;
+                    
                     itens = new ArrayList<Item>();
                     json_ciry = new JSONObject(obj_city.toString());
                     location = json_ciry.get("location").toString();
                     
-                    data = new JSONArray(json_ciry.get("data").toString());
-                    for(Object obj_item: data)
+                    data = new JSONObject(json_ciry.get("data").toString());
+                    a_time = new JSONArray(data.get("timestamps").toString());
+                    a_min = new JSONArray(data.get("prices_min").toString());
+                    a_avg = new JSONArray(data.get("prices_avg").toString());
+                    a_max = new JSONArray(data.get("prices_max").toString());
+                    a_count = new JSONArray(data.get("item_count").toString());
+                    
+                    for(int i = 0; i < a_time.length(); i++)
                     {
-                        json_item = new JSONObject(obj_item.toString());
-                        count = json_item.get("item_count").toString();
-                        price = json_item.get("avg_price").toString();
+                        aux = new Item(location, a_count.get(i).toString(), a_min.get(i).toString(), a_avg.get(i).toString(), a_max.get(i).toString(), a_time.get(i).toString());
+                        itens.add(aux);
                         
-                        aux = new Item(location, count, price);
-                        
-                        min = Math.min(min, aux.getPrice());
-                        max = Math.max(max, aux.getPrice());
-                        avg += aux.getPrice();
+                        min = Integer.min(min, aux.getMin());
+                        avg += aux.getAvg();
+                        max = Integer.max(max, aux.getMax());                        
                     }
-                    avg /= data.length();
+                    avg /= a_time.length();
+                    
+                    head += 
+                            "  <tr>\n" +
+                            "    <td>" + location + "</td>\n" +
+                            "    <td>" + min + "</td>\n" +
+                            "    <td>" + avg + "</td>\n" +
+                            "    <td>" + max + "</td>\n" +
+                            "  </tr>";
+                    
+                    itens.sort(new Comparator<Item> ()
+                    {
+                        @Override
+                        public int compare(Item o1, Item o2)
+                        {
+                            return o1.getTime().compareTo(o2.getTime()) * -1;
+                        }
+                    });
+                    
                     line =  "<table>\n" +
                             "  <tr>\n" +
-                            "    <th>" + location + "</th>\n" +
+                            "    <th>Location</th>\n" +
+                            "    <th>Min</th>\n" +
+                            "    <th>Avg</th>\n" +
+                            "    <th>Max</th>\n" +
                             "  </tr>\n" +
                             "  <tr>\n" +
-                            "    <td>Min</td>\n" +
-                            "    <td>Avg</td>\n" +
-                            "    <td>Max</td>\n" +
-                            "  </tr>\n" +
-                            "  <tr>\n" +
+                            "    <td>" + location + "</td>\n" +
                             "    <td>" + min + "</td>\n" +
                             "    <td>" + avg + "</td>\n" +
                             "    <td>" + max + "</td>\n" +
                             "  </tr>\n" +
-                            "</table>\n" +
-                            "<br>";
+                            "  \n" +
+                            "</table><br>";
                     
-                    content.append(line);
+                    line += "<table>\n"+
+                            "  <tr>\n" +
+                            "    <th>Count</th>\n" +
+                            "    <th>Min</th>\n" +
+                            "    <th>Avg</th>\n" +
+                            "    <th>Max</th>\n" +
+                            "  </tr>\n";
+                    
+                    int n = itens.size() > 10 ? 10 : itens.size();
+                    for(int i = 0; i < n; i++)
+                    {
+                        line +=  
+                            "  <tr>\n" +
+                            "    <td>" + itens.get(i).getCount() + "</td>\n" +
+                            "    <td>" + itens.get(i).getMin() + "</td>\n" +
+                            "    <td>" + itens.get(i).getAvg() + "</td>\n" +
+                            "    <td>" + itens.get(i).getMax() + "</td>\n" +
+                            "  </tr>";
+                            
+                    }
+                    line += "</table><br>";
+                    
+                    body += line;
                 }
+                head += "</table><br>";
                 
-                
+                content.append(head + body);
                 bufferedReader.close();
                 out.println(content.toString());
             }

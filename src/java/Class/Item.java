@@ -1,17 +1,25 @@
 package Class;
 
+import java.util.Date;
+
 
 public class Item
 {
     private String location;
     private int count;
-    private int price;
+    private int min;
+    private int avg;
+    private int max;
+    private Double time;
 
-    public Item(String location, String count, String price)
+    public Item(String location, String count, String min, String avg, String max, String time)
     {
         this.location = location;
         this.count = Integer.parseInt(count);
-        this.price = Integer.parseInt(price);
+        this.min = Integer.parseInt(min);
+        this.avg = Integer.parseInt(avg);
+        this.max = Integer.parseInt(max);
+        this.time = Double.valueOf(time);
     }
 
     public String getLocation()
@@ -34,15 +42,45 @@ public class Item
         this.count = count;
     }
 
-    public int getPrice()
+    public int getMin()
     {
-        return price;
+        return min;
     }
 
-    public void setPrice(int price)
+    public void setMin(int min)
     {
-        this.price = price;
+        this.min = min;
     }
-    
+
+    public int getAvg()
+    {
+        return avg;
+    }
+
+    public void setAvg(int avg)
+    {
+        this.avg = avg;
+    }
+
+    public int getMax()
+    {
+        return max;
+    }
+
+    public void setMax(int max)
+    {
+        this.max = max;
+    }
+
+    public Double getTime()
+    {
+        return time;
+    }
+
+    public void setTime(Double time)
+    {
+        this.time = time;
+    }
+
     
 }
