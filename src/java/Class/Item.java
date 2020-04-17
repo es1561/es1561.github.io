@@ -10,7 +10,7 @@ public class Item
     private int min;
     private int avg;
     private int max;
-    private Double time;
+    private String time;
 
     public Item(String location, String count, String min, String avg, String max, String time)
     {
@@ -19,7 +19,7 @@ public class Item
         this.min = Integer.parseInt(min);
         this.avg = Integer.parseInt(avg);
         this.max = Integer.parseInt(max);
-        this.time = Double.valueOf(time);
+        this.time = time;
     }
 
     public String getLocation()
@@ -72,12 +72,12 @@ public class Item
         this.max = max;
     }
 
-    public Double getTime()
+    public String getTime()
     {
         return time;
     }
 
-    public void setTime(Double time)
+    public void setTime(String time)
     {
         this.time = time;
     }
