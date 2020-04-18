@@ -13,7 +13,7 @@ class Item {
 function evSearch() {
 
     event.preventDefault()
-    let url = "https://www.albion-online-data.com/api/v2/stats/history/" + $('#item_id').val() + "?time-scale=1"
+    let url = "https://www.albion-online-data.com/api/v2/stats/history/" + $('#item_id').val() + "?qualities=1&time-scale=1";
 
 
     //const response = await fetch(url);
@@ -112,3 +112,4 @@ function processaDados(data, size) {
     head += '</table><br>';
     $("#result").html(head + body);
 }
+
