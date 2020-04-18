@@ -78,6 +78,18 @@ function processaDados(data, size) {
                 <td> ${Math.round(avg)} </td>
             </tr>`;
         //falta ordenar
+        
+        itens.sort(function (a, b) {
+            if (a.time > b.time) {
+              return -1;
+            }
+            if (a.name < b.name) {
+              return 1;
+            }
+            // a must be equal to b
+            return 0;
+          });
+        
         line = `<table>
                         <tr>
                             <th>Location</th>
